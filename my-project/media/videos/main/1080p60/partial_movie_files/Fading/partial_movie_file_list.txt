@@ -1,0 +1,2 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/user/Movies/videos/why_func_transformations_reversed/my-project/media/videos/main/1080p60/partial_movie_files/Fading/2257293077_588631447_223132457.mp4'

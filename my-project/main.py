@@ -31,31 +31,101 @@ Other code, such as auxiliary or mathematical functions, may reside outside the 
 
 class DashedGraphScene(Scene):
     def construct(self):
+        transformation_notation = MathTex("{{y=}} {{a}} {{fk(x-d)}} {{+c}}")
+        transformation_notation.to_edge(RIGHT, 1.3)
+        a_index = 2
+        c_index = 6
+        self.add(transformation_notation)
+
         # 1. Create the coordinate axes
         axes = Axes(
             x_range=[0, 12, 1],
-            y_range=[-2, 2, -2],
+            y_range=[-3, 3, -2],
             axis_config={"include_tip": False},
+            x_length=6,
         )
 
         # 2. Generate a standard continuous graph (e.g., f(x) = sqrt(x))
         # Note: DottedVMobject is best for functions.
         # For discrete data, use axes.plot_line_graph() with add_vertex_dots=False
-        continuous_graph = axes.plot(lambda x: np.sin(x), color=BLUE)
+        continuous_graph = axes.plot(lambda x: np.sin(x), color=PURPLE)
 
         # 3. Convert the graph to a dashed/dotted line
-        dashed_graph = DashedVMobject(
+        dotted_sin_func = DashedVMobject(
             continuous_graph,
             num_dashes=200,
             # dash_length=0.001,
-            dashed_ratio=0.1,
+            # dashed_ratio=0.1,
             equal_lengths=True,
+            color="#D79BFA",
+        )
+
+        area_under_curve = axes.get_area(
+            continuous_graph,
+            x_range=[0, 12],
+            color=[PURPLE, BLUE, RED, ORANGE, YELLOW, GREEN],
+            fill_opacity=0.5,
         )
         # graph,
 
         # 4. Add to the scene and animate
-        self.play(Create(axes), run_time=0.4)
-        self.play(Create(dashed_graph), run_time=5)
+        # self.play(Create(axes), run_time=0.4)
+        # self.play(Create(dotted_sin_func), run_time=1)
+        sine_graph = VGroup.add(axes, dotted_sin_func, area_under_curve)
+        sine_graph.to_edge(LEFT, 1)
+        self.add(sine_graph)
+        self.wait(2)
+
+        str_replacement_col = YELLOW
+        shift_replacement_col = PURPLE
+
+        replacement_number = {
+            "vertical_str_by_2": MathTex("2"),
+            "vertical_str_by_1": MathTex("1"),
+            "vertical_shift_down": MathTex("-2"),
+            "vertical_shift_up": MathTex("+2"),
+        }
+
+        self.play(
+            dotted_sin_func.animate.stretch(3, dim=1),
+            Transform(
+                transformation_notation[a_index],
+                replacement_number["vertical_str_by_2"]
+                .set_color(str_replacement_col)
+                .move_to(transformation_notation[a_index]),
+            ),
+            run_time=1.5,
+        )
+        self.play(
+            dotted_sin_func.animate.stretch(0.5, dim=1),
+            Transform(
+                transformation_notation[a_index],
+                replacement_number["vertical_str_by_1"]
+                .set_color(str_replacement_col)
+                .move_to(transformation_notation[a_index]),
+            ),
+            run_time=1,
+        )
+        self.play(
+            dotted_sin_func.animate.shift(DOWN * 2),
+            Transform(
+                transformation_notation[c_index],
+                replacement_number["vertical_shift_down"]
+                .set_color(shift_replacement_col)
+                .move_to(transformation_notation[c_index]),
+            ),
+            run_time=1,
+        )
+        self.play(
+            dotted_sin_func.animate.shift(UP * 4),
+            Transform(
+                transformation_notation[c_index],
+                replacement_number["vertical_shift_up"]
+                .set_color(shift_replacement_col)
+                .move_to(transformation_notation[c_index]),
+            ),
+            run_time=2,
+        )
         self.wait(2)
 
 
@@ -70,26 +140,35 @@ class TransformationNotation(Scene):
 
         transformation_notation = MathTex("{{y=af}} {{k(x-d)}} {{+c}}")
         isolated_input = transformation_notation[2]
+
         isolated_input_indices = [0, 1, 3, 4, 5]
+        output_param_indices = []
 
         self.play(Write(transformation_notation))
 
-        # for i in isolated_input_indices
         self.play(
-            FadeToColor(transformation_notation[2][i], color="#CE78FF")
-            for i in isolated_input_indices
+            FadeToColor(transformation_notation[0][2], color="#D79BFA"),
+            FadeToColor(transformation_notation[4], color="#D79BFA"),
         )
-        self.wait(duration=1)
-        self.play(
-            Transform(
-                transformation_notation,
-                isolated_input,
-                run_time=1,
-            )
-        )
+
+        # self.play(
+        #     FadeToColor(transformation_notation[2][i], color="#CE78FF")
+        #     for i in isolated_input_indices
+        # )
+        # self.wait(duration=1)
+        # self.play(
+        #     Transform(
+        #         transformation_notation,
+        #         isolated_input,
+        #         run_time=1,
+        #     )
+        # )
+
         self.wait(duration=0.3)
         self.play(ScaleInPlace(transformation_notation, 2))
         self.wait(duration=2)
+
+        # self.play(Transform(transformation_notation))
 
         # self.play()
 

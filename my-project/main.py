@@ -32,7 +32,7 @@ Other code, such as auxiliary or mathematical functions, may reside outside the 
 class DashedGraphScene(Scene):
     def construct(self):
         transformation_notation = MathTex("{{y=}} {{a}} {{fk(x-d)}} {{+c}}")
-        transformation_notation.to_edge(RIGHT, 1.3)
+        transformation_notation.to_edge(RIGHT, 1.7)
         a_index = 2
         c_index = 6
         self.add(transformation_notation)
@@ -57,23 +57,48 @@ class DashedGraphScene(Scene):
             # dash_length=0.001,
             # dashed_ratio=0.1,
             equal_lengths=True,
-            color="#D79BFA",
+            color="#9BE1FA",
         )
 
         area_under_curve = axes.get_area(
             continuous_graph,
             x_range=[0, 12],
-            color=[PURPLE, BLUE, RED, ORANGE, YELLOW, GREEN],
+            color=[PURPLE, PINK, BLUE],
             fill_opacity=0.5,
         )
+
+        # def update_area(area):
+        #     # .become() swaps the internal polygon meshes smoothly frame-by-frame
+        #     new_area = axes.get_area(
+        #         continuous_graph,
+        #         x_range=[0, 12],
+        #         color=[PURPLE, PINK, BLUE],
+        #         fill_opacity=0.5,
+        #     ).to_edge(LEFT, 1)
+        #     MaintainPositionRelativeTo(new_area, dotted_sin_func)
+        #     area.become(new_area)
+
         # graph,
 
         # 4. Add to the scene and animate
         # self.play(Create(axes), run_time=0.4)
         # self.play(Create(dotted_sin_func), run_time=1)
-        sine_graph = VGroup.add(axes, dotted_sin_func, area_under_curve)
+        sine_graph = VGroup.add(axes, continuous_graph, area_under_curve)
         sine_graph.to_edge(LEFT, 1)
         self.add(sine_graph)
+
+        # area_under_curve.add_updater(update_area)
+
+        def update_area(area):
+            new_area = axes.get_area(
+                continuous_graph,
+                x_range=[0, 12],
+                color=[PURPLE, PINK, BLUE],
+                fill_opacity=0.5,
+            )
+            area.become(new_area)
+
+        area_under_curve.add_updater(update_area)
         self.wait(2)
 
         str_replacement_col = YELLOW
@@ -87,17 +112,20 @@ class DashedGraphScene(Scene):
         }
 
         self.play(
-            dotted_sin_func.animate.stretch(3, dim=1),
+            continuous_graph.animate.stretch(3, dim=1),
             Transform(
                 transformation_notation[a_index],
                 replacement_number["vertical_str_by_2"]
                 .set_color(str_replacement_col)
-                .move_to(transformation_notation[a_index]),
+                .move_to(transformation_notation[a_index])
+                .shift(UP * 0.06),
             ),
             run_time=1.5,
         )
+        self.wait(1)
+
         self.play(
-            dotted_sin_func.animate.stretch(0.5, dim=1),
+            continuous_graph.animate.stretch(0.5, dim=1),
             Transform(
                 transformation_notation[a_index],
                 replacement_number["vertical_str_by_1"]
@@ -106,8 +134,10 @@ class DashedGraphScene(Scene):
             ),
             run_time=1,
         )
+        self.wait(1)
+
         self.play(
-            dotted_sin_func.animate.shift(DOWN * 2),
+            continuous_graph.animate.shift(DOWN * 2),
             Transform(
                 transformation_notation[c_index],
                 replacement_number["vertical_shift_down"]
@@ -116,8 +146,10 @@ class DashedGraphScene(Scene):
             ),
             run_time=1,
         )
+        self.wait(1)
+
         self.play(
-            dotted_sin_func.animate.shift(UP * 4),
+            continuous_graph.animate.shift(UP * 4),
             Transform(
                 transformation_notation[c_index],
                 replacement_number["vertical_shift_up"]

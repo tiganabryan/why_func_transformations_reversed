@@ -1,0 +1,3 @@
+{
+    "TransformationNotation": "class TransformationNotation(Scene):\n    def construct(self):\n        transformation_notation = MathTex(\"{{y=af}} {{k(x-d)}} {{+c}}\")\n        transformation_notation[2].set_color(BLUE)\n        self.play(Write(transformation_notation))\n        self.wait(duration=5)"
+}

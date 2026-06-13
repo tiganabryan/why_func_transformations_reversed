@@ -70,13 +70,26 @@ class TransformationNotation(Scene):
 
         transformation_notation = MathTex("{{y=af}} {{k(x-d)}} {{+c}}")
         isolated_input = transformation_notation[2]
+        isolated_input_indices = [0, 1, 3, 4, 5]
 
         self.play(Write(transformation_notation))
 
-        self.play(FadeToColor(transformation_notation[2], color=PURPLE, run_time=1))
-        # self.wait(duration=2)
-        self.play(Transform(transformation_notation, isolated_input, run_time=1))
-        self.wait(duration=3)
+        # for i in isolated_input_indices
+        self.play(
+            FadeToColor(transformation_notation[2][i], color="#CE78FF")
+            for i in isolated_input_indices
+        )
+        self.wait(duration=1)
+        self.play(
+            Transform(
+                transformation_notation,
+                isolated_input,
+                run_time=1,
+            )
+        )
+        self.wait(duration=0.3)
+        self.play(ScaleInPlace(transformation_notation, 2))
+        self.wait(duration=2)
 
         # self.play()
 

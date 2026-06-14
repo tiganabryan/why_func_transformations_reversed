@@ -1,0 +1,4 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/user/Movies/videos/why_func_transformations_reversed/my-project/media/videos/main/720p30/partial_movie_files/HorizontalTransformationScene/1987512680_4028536258_3569554998.mp4'
+file 'file:/Users/user/Movies/videos/why_func_transformations_reversed/my-project/media/videos/main/720p30/partial_movie_files/HorizontalTransformationScene/2538612922_3436223093_873176618.mp4'
+file 'file:/Users/user/Movies/videos/why_func_transformations_reversed/my-project/media/videos/main/720p30/partial_movie_files/HorizontalTransformationScene/2538612922_1391709230_2292103821.mp4'

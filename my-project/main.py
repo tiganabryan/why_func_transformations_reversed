@@ -1,175 +1,94 @@
 from manim import *
 from manim_themes.manim_theme import apply_theme
 
-"""
-Most of the time, the code for scripting an animation is entirely contained within the
-construct() method of a Scene class. Inside construct(), you can create objects, 
-display them on screen, and animate them.
 
-All animations must reside within the construct() method of a class derived from Scene.
-Other code, such as auxiliary or mathematical functions, may reside outside the class.
-"""
+class TransformationNotation(MathTex):
+    def __init__(self):
+        super().__init__()
 
+        self.tex = MathTex(
+            "y=",
+            "a",
+            "f",
+            "k",
+            "(",
+            "x",
+            "-d",
+            ")",
+            "+c",
+        )
 
-# class ThemeExample(Scene):
-#     # def setup(self):
-#     #     theme = "tokyonight"
-#     #     apply_theme(manim_scene=self, theme_name=theme, light_theme=True)
+        self.a = self.tex[1]
+        self.k = self.tex[3]
+        self.d = self.tex[6]
+        self.c = self.tex[8]
 
-#     def construct(self):
-#         my_text = Tex("af(x-d)+c")
-#         # maroon_text = Tex("af(x-d)+c", color=PINK)
-#         # maroon_text.next_to(my_text, DOWN)
-
-#         text_group = VGroup(my_text).move_to(ORIGIN)
-
-#         self.play(FadeIn(text_group), run_time=3)
-
-
-# from manim import *
+        self.add(self.tex)
 
 
-class DashedGraphScene(Scene):
+class BaseTransformationScene(Scene):
+    """
+    Quickly create function transformation animations.
+    """
+
+    def setup(self):
+        self.general_transformation_equation = TransformationNotation()
+
     def construct(self):
-        transformation_notation = MathTex("{{y=}} {{a}} {{fk(x-d)}} {{+c}}")
-        transformation_notation.to_edge(RIGHT, 1.7)
-        a_index = 2
-        c_index = 6
-        self.add(transformation_notation)
+        return super().construct()
 
-        # 1. Create the coordinate axes
-        axes = Axes(
-            x_range=[0, 12, 1],
-            y_range=[-3, 3, -2],
-            axis_config={"include_tip": False},
-            x_length=6,
-        )
 
-        # 2. Generate a standard continuous graph (e.g., f(x) = sqrt(x))
-        # Note: DottedVMobject is best for functions.
-        # For discrete data, use axes.plot_line_graph() with add_vertex_dots=False
-        continuous_graph = axes.plot(lambda x: np.sin(x), color=PURPLE)
-
-        # 3. Convert the graph to a dashed/dotted line
-        dotted_sin_func = DashedVMobject(
-            continuous_graph,
-            num_dashes=200,
-            # dash_length=0.001,
-            # dashed_ratio=0.1,
-            equal_lengths=True,
-            color="#9BE1FA",
-        )
-
-        area_under_curve = axes.get_area(
-            continuous_graph,
-            x_range=[0, 12],
-            color=[PURPLE, PINK, BLUE],
-            fill_opacity=0.5,
-        )
-
-        # def update_area(area):
-        #     # .become() swaps the internal polygon meshes smoothly frame-by-frame
-        #     new_area = axes.get_area(
-        #         continuous_graph,
-        #         x_range=[0, 12],
-        #         color=[PURPLE, PINK, BLUE],
-        #         fill_opacity=0.5,
-        #     ).to_edge(LEFT, 1)
-        #     MaintainPositionRelativeTo(new_area, dotted_sin_func)
-        #     area.become(new_area)
-
-        # graph,
-
-        # 4. Add to the scene and animate
-        # self.play(Create(axes), run_time=0.4)
-        # self.play(Create(dotted_sin_func), run_time=1)
-        sine_graph = VGroup.add(axes, continuous_graph, area_under_curve)
-        sine_graph.to_edge(LEFT, 1)
-        self.add(sine_graph)
-
-        # area_under_curve.add_updater(update_area)
-
-        def update_area(area):
-            new_area = axes.get_area(
-                continuous_graph,
-                x_range=[0, 12],
-                color=[PURPLE, PINK, BLUE],
-                fill_opacity=0.5,
-            )
-            area.become(new_area)
-
-        area_under_curve.add_updater(update_area)
-        self.wait(2)
-
-        str_replacement_col = YELLOW
-        shift_replacement_col = PURPLE
-
-        replacement_number = {
-            "vertical_str_by_2": MathTex("2"),
-            "vertical_str_by_1": MathTex("1"),
-            "vertical_shift_down": MathTex("-2"),
-            "vertical_shift_up": MathTex("+2"),
-        }
+class VerticalTransformationScene(BaseTransformationScene):
+    def construct(self):
+        self.wait(1)
 
         self.play(
-            continuous_graph.animate.stretch(3, dim=1),
+            self.function_object.animate.stretch(3, dim=1),
             Transform(
-                transformation_notation[a_index],
-                replacement_number["vertical_str_by_2"]
-                .set_color(str_replacement_col)
-                .move_to(transformation_notation[a_index])
+                self.transformation_notation[self.a_index],
+                MathTex("2")
+                .set_color(YELLOW)
+                .move_to(self.transformation_notation[self.a_index])
                 .shift(UP * 0.06),
             ),
             run_time=1.5,
         )
+
+        self.wait(2)
+
+
+class HorizontalTransformationScene(BaseTransformationScene):
+    def setup(self):
+        default_plot_length = 3
+        self.transformation_mathtex = MathTex(self.transformation_notation)
+        self.a = self.transformation_mathtex[0]
+
+        graph_config = self.default_graph_config.copy()
+        graph_config["x_range"] = [0, default_plot_length]
+        print(f"{default_plot_length}")
+
+        super().setup()
+
+    def construct(self):
         self.wait(1)
 
         self.play(
-            continuous_graph.animate.stretch(0.5, dim=1),
+            # Transform(self.function_object)
+            self.function_object.animate.shift(RIGHT * 2),
             Transform(
-                transformation_notation[a_index],
-                replacement_number["vertical_str_by_1"]
-                .set_color(str_replacement_col)
-                .move_to(transformation_notation[a_index]),
+                self.transformation_notation,
+                MathTex("-2)")
+                .set_color(RED)
+                .move_to(self.transformation_notation[self.d_index]),
             ),
-            run_time=1,
+            run_time=1.5,
         )
-        self.wait(1)
 
-        self.play(
-            continuous_graph.animate.shift(DOWN * 2),
-            Transform(
-                transformation_notation[c_index],
-                replacement_number["vertical_shift_down"]
-                .set_color(shift_replacement_col)
-                .move_to(transformation_notation[c_index]),
-            ),
-            run_time=1,
-        )
-        self.wait(1)
-
-        self.play(
-            continuous_graph.animate.shift(UP * 4),
-            Transform(
-                transformation_notation[c_index],
-                replacement_number["vertical_shift_up"]
-                .set_color(shift_replacement_col)
-                .move_to(transformation_notation[c_index]),
-            ),
-            run_time=2,
-        )
         self.wait(2)
 
 
 class TransformationNotation(Scene):
     def construct(self):
-        # equation = MathTex(
-        #     r"e^{x} = x^0 + x^1 + \frac{1}{2} x^2 + \frac{1}{6} x^3 + \cdots + \frac{1}{n!} x^n + \cdots",
-        #     substrings_to_isolate="x",
-        # )
-        # equation.set_color_by_tex("x", YELLOW)
-        # self.play(Write(equation))
-
         transformation_notation = MathTex("{{y=af}} {{k(x-d)}} {{+c}}")
         isolated_input = transformation_notation[2]
 
@@ -216,135 +135,12 @@ class TransformationNotation(Scene):
         # self.play(Transform(transformation_notation, isolated_input))
 
 
-# class CreateCircle(Scene):
-#     def construct(self):
-#         circle = Circle()  # create a circle
-#         circle.set_fill(PINK, opacity=0.5)  # set the color and transparency
-#         self.play(Create(circle))  # "Create" is what displays the circle on screen
-
-
-# class SquareToCircle(Scene):
-#     def construct(self):
-#         circle = Circle()  # create a circle
-#         circle.set_fill(PINK, opacity=0.5)  # set color and transparency
-
-#         square = Square()  # create a square
-#         square.rotate(PI / 4)  # rotate a certain amount
-
-#         self.play(Create(square))  # animate the creation of the square
-#         self.play(Transform(square, circle))  # interpolate the square into the circle
-#         self.play(FadeOut(square))  # fade out animation
-
-
-# class SquareAndCircle(Scene):
-#     def construct(self):
-#         circle = Circle()  # create a circle
-#         circle.set_fill(PINK, opacity=0.5)  # set the color and transparency
-
-#         square = Square()  # create a square
-#         square.set_fill(BLUE, opacity=0.5)  # set the color and transparency
-
-#         square.next_to(circle, RIGHT, buff=0.5)  # set the position
-#         self.play(Create(circle), Create(square))  # show the shapes on screen
-
-
-# class AnimatedSquareToCircle(Scene):
-#     def construct(self):
-#         circle = Circle()  # create a circle
-#         square = Square()  # create a square
-
-#         self.play(Create(square))  # show the square on screen
-#         self.play(square.animate.rotate(PI / 4))  # rotate the square
-#         self.play(Transform(square, circle))  # transform the square into a circle
-#         self.play(
-#             square.animate.set_fill(PINK, opacity=0.5)
-#         )  # color the circle on screen
-
-
-# class HelloLaTeX(Scene):
-#     def construct(self):
-#         tex = Tex(r"f(x)", font_size=144)
-#         self.add(tex)
-
-
-# class Fading(Scene):
-#     def construct(self):
-#         tex_in = Tex("f(x)").move_to(2.5 * UP)
-#         self.play(Write(tex_in))
-#         # tex_out = Tex("Fade", "Out").scale(3)
-#         # self.play(FadeIn(tex_in, shift=DOWN, scale=0.66))
-#         # self.play(ReplacementTransform(tex_in, tex_out))
-#         # self.play(
-#         #     LaggedStart(
-#         #         *(FadeIn(tex_in, scale=1.5) for char in tex_in),
-#         #         # shift=2,
-#         #         lag_ratio=0.1,
-#         #         run_time=2
-#         #     )
-#         # ),
-#         # self.wait(1)
-
-
-# class LaggingGroup(Scene):
-#     def construct(self):
-#         circles = (
-#             VGroup(*[Circle(radius=1, color=TEAL, fill_opacity=0.5) for j in range(10)])
-#             .arrange_in_grid(2, 5)
-#             .scale(0.5)
-#         )
-#         tex = Text("lag_ratio=0").move_to(2.5 * UP)
-#         self.play(Write(tex))
-#         self.play(AnimationGroup(*[FadeIn(s) for s in circles], lag_ratio=0))
-#         self.wait(2)
-#         self.play(AnimationGroup(*[FadeOut(s) for s in circles], lag_ratio=0))
-#         self.play(FadeOut(tex))
-
-#         circles = (
-#             VGroup(*[Circle(radius=1, color=TEAL, fill_opacity=0.5) for j in range(10)])
-#             .arrange_in_grid(2, 5)
-#             .scale(0.5)
-#         )
-#         tex = Text("lag_ratio=0.5").move_to(2.5 * UP)
-#         self.play(Write(tex))
-#         self.play(AnimationGroup(*[FadeIn(s) for s in circles], lag_ratio=0.5))
-#         self.wait(2)
-#         self.play(AnimationGroup(*[FadeOut(s) for s in circles], lag_ratio=0.5))
-#         self.play(FadeOut(tex))
-
-#         circles = (
-#             VGroup(*[Circle(radius=1, color=TEAL, fill_opacity=0.5) for j in range(10)])
-#             .arrange_in_grid(2, 5)
-#             .scale(0.5)
-#         )
-#         tex = Text("lag_ratio=1").move_to(2.5 * UP)
-#         self.play(Write(tex))
-#         self.play(AnimationGroup(*[FadeIn(s) for s in circles], lag_ratio=1))
-#         self.wait(2)
-#         self.play(AnimationGroup(*[FadeOut(s) for s in circles], lag_ratio=1))
-#         self.play(FadeOut(tex))
-
-
 if __name__ == "main":
     import os
     from pathlib import Path
 
     FLAGS = "-pqm"
-    SCENE = "ThemeExample"
+    SCENE = "DashedGraphScene"
 
     file_path = Path(__file__).resolve()
     os.system(f"manim {Path(__file__).resolve()} {SCENE} {FLAGS}")
-
-
-# from manim import *
-# class DefaultTemplate(Scene):
-#     def construct(self):
-#         circle = Circle()  # create a circle
-#         circle.set_fill(PINK, opacity=0.5)  # set color and transparency
-
-#         square = Square()  # create a square
-#         square.flip(RIGHT)  # flip horizontally
-#         square.rotate(-3 * TAU / 8)  # rotate a certain amount
-
-#         self.play(Create(square))  # animate the creation of the square
-#         self.play(Transform(square, circle))  # interpolate the square into the circle
-#         self.play(FadeOut(square))  # fade out animation

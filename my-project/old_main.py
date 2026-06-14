@@ -13,8 +13,23 @@ Other code, such as auxiliary or mathematical functions, may reside outside the 
 
 class BaseTransformationScene(Scene):
     """
-    Quickly create function transformation animations.
+    Quickly create my function transformation animations
     """
+
+    def __init__(
+        self,
+        plot_length: int | float = 8,
+        function_expression=lambda x: np.sin(x),
+        x_axis_length: int | float = None,
+        function_length: int | float = None,
+        **kwargs,
+    ):
+        self.plot_length = plot_length
+        self.function_expression = function_expression
+        self.function_length = function_length
+        self.x_axis_length = x_axis_length
+
+        super().__init__(**kwargs)
 
     @property
     def axes_config(self):
@@ -22,7 +37,7 @@ class BaseTransformationScene(Scene):
             "x_range": [0, self.plot_length, 1],  # (x_min, x_max, x_step)
             "y_range": [-3, 3, -2],
             "axis_config": {"include_tip": False},
-            "x_length": self.plot_length,
+            "x_length": self.x_axis_length or self.plot_length,
         }
 
     @property
@@ -30,17 +45,16 @@ class BaseTransformationScene(Scene):
         return {
             "function": lambda x: np.sin(x),
             "color": "PURPLE",
-            "x_range": [0, self.plot_length],
+            "x_range": [0, self.function_length or self.plot_length],
         }
 
-    def __init__(
-        self, plot_length=8, function_expression=lambda x: np.sin(x), **kwargs
-    ):
-        self.plot_length = plot_length
-        self.function_expression = function_expression
-        super().__init__(**kwargs)
-
     def setup(self):
+        for setting in self.graph_config:
+            print(self.graph_config[f"{setting}"])
+
+        for setting in self.axes_config:
+            print(self.axes_config[f"{setting}"])
+
         # plot_length = getattr(self, "plot_length", plot_length)
         # axes_config = getattr(self, "axes_config", self.axes_config)
         # graph_config = getattr(self, "graph_config", self.graph_config)
@@ -54,7 +68,7 @@ class BaseTransformationScene(Scene):
         self.d_index = 10
         self.k_index = 6
 
-        # self.add(self.transformation_notation)
+        self.add(self.transformation_notation)
 
         # 1. Create the coordinate axes
         self.axes = Axes(
@@ -132,7 +146,8 @@ class VerticalTransformationScene(BaseTransformationScene):
 
 class HorizontalTransformationScene(BaseTransformationScene):
     def setup(self):
-        self.plot_length = 3
+        self.plot_length = 7
+        self.function_length = 4
         # plot_length = 4
 
         # axes_config = self.axes_config.copy()

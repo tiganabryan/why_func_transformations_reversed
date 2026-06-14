@@ -95,7 +95,7 @@ class BaseTransformationScene(Scene):
 
         self.area_under_curve = self.axes.get_area(
             self.function_object,
-            x_range=[0, self.plot_length],
+            x_range=[0, self.function_length or self.plot_length],
             color=[PURPLE, PINK, BLUE],
             fill_opacity=0.5,
         )

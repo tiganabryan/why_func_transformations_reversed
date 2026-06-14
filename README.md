@@ -1,7 +1,7 @@
 # WIP. explainer video on the connection between reference frames in physics and transformations of functions
 Math has a reputation for being a collection of (bad) recipes to be memorized, when that **could not** be further from the truth!
 
-The idea that certain math operations done to functions appear "reversed" isn't just an off-hand fact to memorize; updating and nesting coordinate systems is at the core of how we describe physical phenomena.
+The idea that certain math operations done to functions appear "reversed" isn't just an off-hand fact to memorize; updating and nesting coordinate systems inside each other is at the core of how we describe physical phenomena.
 
 I want to share how the reasoning behind this extends into linear algebra, visual arts, and the physical sciences. So, here I am... Programming math animations. Such is life
 

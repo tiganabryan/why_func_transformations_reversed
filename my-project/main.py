@@ -1,5 +1,7 @@
 from manim import *
 from manim_themes.manim_theme import apply_theme
+from numpy import typing
+from typing import Callable, Any
 
 # "Most of the time, the code for scripting an animation is entirely contained within the
 # construct() method of a Scene class. Inside construct(), you can create objects,
@@ -18,15 +20,25 @@ class BaseTransformationScene(Scene):
     def __init__(
         self,
         plot_length: int | float = 8,
-        function_expression=lambda x: np.sin(x),
+        # parent_function=lambda x: np.sin(x),
+        parent_function: Callable = np.sin,  # e.g. np.log, np.sqrt, etc.
+        vert_stretch: int | float = 1,
+        vert_shift: int | float = 0,
+        horz_stretch: int | float = 1,
+        horz_shift: int | float = 0,
         x_axis_length: int | float = None,
         function_length: int | float = None,
         **kwargs,
     ):
         self.plot_length = plot_length
-        self.function_expression = function_expression
-        self.function_length = function_length
         self.x_axis_length = x_axis_length
+
+        self.parent_function = parent_function
+        self.function_length = function_length
+        self.vert_stretch = vert_stretch
+        self.vert_shift = vert_shift
+        self.horz_stretch = horz_stretch
+        self.horz_shift = horz_shift
 
         super().__init__(**kwargs)
 
@@ -40,12 +52,25 @@ class BaseTransformationScene(Scene):
         }
 
     @property
+    def transformed_function_callable(self):
+        return lambda x: (
+            # fmt: off
+            self.vert_stretch.get_value() * self.parent_function(self.horz_stretch.get_value() * (x - self.horz_shift.get_value())) + self.vert_shift.get_value()
+            # fmt: on
+            # python version of y=afk(x-d)+c
+        )
+
+    @property
     def graph_config(self):
         return {
-            "function": lambda x: np.sin(x),
+            "function": self.transformed_function_callable,
             "color": "PURPLE",
             "x_range": [0, self.function_length or self.plot_length],
         }
+
+    def apply_vert_stretch(self, value: int | float = 1):
+        self.vert_stretch = value
+        self.rerender_graph()
 
     def setup(self):
         for setting in self.graph_config:
@@ -54,16 +79,21 @@ class BaseTransformationScene(Scene):
         for setting in self.axes_config:
             print(self.axes_config[f"{setting}"])
 
-        mobject = self.general_transformation_equation = MathTex(
+        self.general_transformation_equation = MathTex(
             "{{y=}} {{a}} {{f}} {{k}} {{(x}} {{-d)}} {{+c}}"
         )
-        mobject = self.general_transformation_equation.to_edge(RIGHT, 1.7)
+        self.general_transformation_equation.to_edge(RIGHT, 1.7)
         self.a_index = 2
         self.c_index = 12
         self.d_index = 10
         self.k_index = 6
 
         self.add(self.general_transformation_equation)  # render it on screen
+
+        self.vert_stretch = ValueTracker(1)
+        self.vert_shift = ValueTracker(0)
+        self.horz_stretch = ValueTracker(1)
+        self.horz_shift = ValueTracker(0)
 
         # create coordinate system obj
         self.axes = Axes(
@@ -72,9 +102,13 @@ class BaseTransformationScene(Scene):
 
         # create function's graph obj
         for val in self.graph_config:
-            print(f"{self.graph_config[val]}")
+            print(self.graph_config[val], type(self.graph_config[val]))
 
-        self.function_object = self.axes.plot(**self.graph_config)
+        self.function_object = self.axes.plot(
+            function=self.graph_config["function"],
+            color=self.graph_config["color"],
+            x_range=self.graph_config["x_range"],
+        )
 
         # dotted line version
         # dotted_sin_func = DashedVMobject(
@@ -116,6 +150,20 @@ class BaseTransformationScene(Scene):
             lambda dt: update_area(self)
         )  # dt param is passed in by manim. not used but required by manim
 
+        def rerender_graph(self):
+            new_graph = self.axes.plot(**self.graph_config)
+            self.function_object.become(new_graph)
+
+        self.function_object.add_updater(
+            lambda m: m.become(
+                self.axes.plot(
+                    self.transformed_function_callable,
+                    color=PURPLE,
+                    x_range=[0, self.plot_length],
+                )
+            )
+        )
+
     def construct(self):
         return super().construct()
 
@@ -131,7 +179,8 @@ class VerticalTransformationScene(BaseTransformationScene):
         self.wait(1)
 
         self.play(
-            self.function_object.animate.stretch(3, dim=1),
+            self.vert_stretch.animate.set_value(3),
+            # self.function_object.animate.stretch(3, dim=1),
             Transform(
                 mobject=self.general_transformation_equation[self.a_index],
                 target_mobject=MathTex("2")
@@ -144,10 +193,10 @@ class VerticalTransformationScene(BaseTransformationScene):
         self.wait(1)
 
         self.play(
-            self.function_object.animate.stretch(0.5, dim=1),
+            self.vert_stretch.animate.set_value(0.5),
             Transform(
                 mobject=self.general_transformation_equation[self.a_index],
-                target_mobject=MathTex("1")
+                target_mobject=MathTex(r"\tfrac{1}{2}")
                 .set_color(YELLOW)
                 .move_to(self.general_transformation_equation[self.a_index]),
             ),
@@ -156,7 +205,8 @@ class VerticalTransformationScene(BaseTransformationScene):
         self.wait(1)
 
         self.play(
-            self.function_object.animate.shift(DOWN * 2),
+            self.vert_shift.animate.set_value(-2),
+            # self.function_object.animate.shift(DOWN * 2),
             Transform(
                 mobject=self.general_transformation_equation[self.c_index],
                 target_mobject=MathTex("-2")
@@ -170,7 +220,7 @@ class VerticalTransformationScene(BaseTransformationScene):
         self.wait(1)
 
         self.play(
-            self.function_object.animate.shift(UP * 4),
+            self.vert_shift.animate.set_value(2),
             Transform(
                 mobject=self.general_transformation_equation[self.c_index],
                 target_mobject=MathTex("+2")
@@ -186,7 +236,7 @@ class VerticalTransformationScene(BaseTransformationScene):
 class HorizontalTransformationScene(BaseTransformationScene):
     def setup(self):
         self.plot_length = 7
-        self.function_length = 4
+        # self.function_length = 4
 
         super().setup()
 
@@ -195,14 +245,18 @@ class HorizontalTransformationScene(BaseTransformationScene):
 
         self.play(
             # Transform(self.function_object) # replace animation with a real transformation on the graph obj eventually
-            self.function_object.animate.shift(RIGHT * 2),
+            # self.function_object.animate.shift(RIGHT * 2),
+            self.horz_shift.animate.set_value(2),
+            run_time=1,
+        )
+
+        self.play(
             Transform(
                 mobject=self.general_transformation_equation[self.d_index],
                 target_mobject=MathTex("-2)")
-                .set_color(RED)
+                .set_color("#FF4848")
                 .move_to(self.general_transformation_equation[self.d_index]),
-            ),
-            run_time=1.5,
+            )
         )
 
         self.wait(2)

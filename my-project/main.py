@@ -1,14 +1,13 @@
 from manim import *
 from manim_themes.manim_theme import apply_theme
 
-"""
-Most of the time, the code for scripting an animation is entirely contained within the
-construct() method of a Scene class. Inside construct(), you can create objects, 
-display them on screen, and animate them.
+# "Most of the time, the code for scripting an animation is entirely contained within the
+# construct() method of a Scene class. Inside construct(), you can create objects,
+# display them on screen, and animate them.
 
-All animations must reside within the construct() method of a class derived from Scene.
-Other code, such as auxiliary or mathematical functions, may reside outside the class.
-"""
+# All animations must reside within the construct() method of a class derived from Scene.
+# Other code, such as auxiliary or mathematical functions, may reside outside the class."
+# – manim docs
 
 
 class BaseTransformationScene(Scene):

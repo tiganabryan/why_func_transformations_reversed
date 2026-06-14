@@ -87,7 +87,7 @@ class BaseTransformationScene(Scene):
         #     color="#9BE1FA",
         # )
 
-        # add colour fill to graph
+        # add colour fill to graph test
         self.area_under_curve = self.axes.get_area(
             self.function_object,
             x_range=[0, self.function_length or self.plot_length],

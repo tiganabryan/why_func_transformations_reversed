@@ -233,73 +233,10 @@ class VerticalTransformationScene(BaseTransformationScene):
         self.wait(2)
 
 
-# class VerticalTransformationScene(BaseTransformationScene):
-#     def setup(self):
-#         self.plot_length = 6
-#         # self.function_length = 4
-
-#         super().setup()
-
-#     def construct(self):
-#         self.wait(1)
-
-#         self.play(
-#             self.function_object.animate.stretch(3, dim=1),
-#             Transform(
-#                 mobject=self.general_transformation_equation[self.a_index],
-#                 target_mobject=MathTex("2")
-#                 .set_color(YELLOW)
-#                 .move_to(self.general_transformation_equation[self.a_index])
-#                 .shift(UP * 0.06),
-#             ),
-#             run_time=1.5,
-#         )
-#         self.wait(1)
-
-#         self.play(
-#             self.function_object.animate.stretch(0.5, dim=1),
-#             Transform(
-#                 mobject=self.general_transformation_equation[self.a_index],
-#                 target_mobject=MathTex("1")
-#                 .set_color(YELLOW)
-#                 .move_to(self.general_transformation_equation[self.a_index]),
-#             ),
-#             run_time=1,
-#         )
-#         self.wait(1)
-
-#         self.play(
-#             self.function_object.animate.shift(DOWN * 2),
-#             Transform(
-#                 mobject=self.general_transformation_equation[self.c_index],
-#                 target_mobject=MathTex("-2")
-#                 .set_color(ORANGE)
-#                 .move_to(self.general_transformation_equation[self.c_index])
-#                 .shift(LEFT * 0.1)
-#                 .shift(UP * 0.02),
-#             ),
-#             run_time=1,
-#         )
-#         self.wait(1)
-
-#         self.play(
-#             self.function_object.animate.shift(UP * 4),
-#             Transform(
-#                 mobject=self.general_transformation_equation[self.c_index],
-#                 target_mobject=MathTex("+2")
-#                 .set_color(ORANGE)
-#                 .move_to(self.general_transformation_equation[self.c_index]),
-#                 # .shift(LEFT * 0.1),
-#             ),
-#             run_time=2,
-#         )
-#         self.wait(2)
-
-
 class HorizontalTransformationScene(BaseTransformationScene):
     def setup(self):
         self.plot_length = 7
-        self.function_length = 4
+        # self.function_length = 4
 
         super().setup()
 
@@ -308,14 +245,18 @@ class HorizontalTransformationScene(BaseTransformationScene):
 
         self.play(
             # Transform(self.function_object) # replace animation with a real transformation on the graph obj eventually
-            self.function_object.animate.shift(RIGHT * 2),
+            # self.function_object.animate.shift(RIGHT * 2),
+            self.horz_shift.animate.set_value(2),
+            run_time=1,
+        )
+
+        self.play(
             Transform(
                 mobject=self.general_transformation_equation[self.d_index],
                 target_mobject=MathTex("-2)")
-                .set_color(RED)
+                .set_color("#FF4848")
                 .move_to(self.general_transformation_equation[self.d_index]),
-            ),
-            run_time=1.5,
+            )
         )
 
         self.wait(2)
